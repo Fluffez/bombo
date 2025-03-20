@@ -214,7 +214,6 @@
                     mermiRect.top > resimRect.bottom
                 );
                 
-                // Mermi ekrandan çıktı mı kontrolü
                 const outOfBounds = 
                     mermi.x < 0 || 
                     mermi.y < 0 || 
@@ -316,7 +315,6 @@
             
             resim.style.transform = `rotate(${Math.sin(Date.now() / 1000) * 5}deg)`;
             
-            // Mermileri hareket ettir
             if (mod === 'shooting') {
                 mermiHareketEttir();
             }
