@@ -38,7 +38,7 @@
         
         .silah {
             position: absolute;
-            width: 80px;
+            width: 160px; 
             height: auto;
             z-index: 10;
             transform-origin: center;
@@ -139,11 +139,12 @@
             if (mod === 'shooting') {
                 silahResim.style.left = (fareX - silahResim.width / 2) + 'px';
                 silahResim.style.top = (fareY - silahResim.height / 2) + 'px';
-            
-                const hedefX = x + resim.width / 2;
-                const hedefY = y + resim.height / 2;
-                const aci = Math.atan2(hedefY - fareY, hedefX - fareX) * 180 / Math.PI;
-                silahResim.style.transform = `rotate(${aci}deg)`;
+                
+                // Silahın dönme kısmı
+                // const hedefX = x + resim.width / 2;
+                // const hedefY = y + resim.height / 2;
+                // const aci = Math.atan2(hedefY - fareY, hedefX - fareX) * 180 / Math.PI;
+                // silahResim.style.transform = `rotate(${aci}deg)`;
             }
         });
         
@@ -190,7 +191,7 @@
                 hedefX: hedefX,
                 hedefY: hedefY
             });
-        }
+            }
         
         function mermiHareketEttir() {
             for (let i = mermiler.length - 1; i >= 0; i--) {
