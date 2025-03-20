@@ -34,6 +34,11 @@
             width: 350px;
             height: auto;
             transition: transform 0.2s ease-out;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            pointer-events: auto;
         }
         
         .silah {
@@ -43,6 +48,7 @@
             z-index: 10;
             transform-origin: center;
             pointer-events: none;
+            user-select: none;
         }
         
         .mermi {
@@ -131,6 +137,10 @@
         resim.style.left = x + 'px';
         resim.style.top = y + 'px';
         
+        resim.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+        });
+        
         alan.addEventListener('mousemove', (e) => {
             const rect = alan.getBoundingClientRect();
             fareX = e.clientX - rect.left;
@@ -139,19 +149,19 @@
             if (mod === 'shooting') {
                 silahResim.style.left = (fareX - silahResim.width / 2) + 'px';
                 silahResim.style.top = (fareY - silahResim.height / 2) + 'px';
-                
-                // Silahın dönme kısmı
-                // const hedefX = x + resim.width / 2;
-                // const hedefY = y + resim.height / 2;
-                // const aci = Math.atan2(hedefY - fareY, hedefX - fareX) * 180 / Math.PI;
-                // silahResim.style.transform = `rotate(${aci}deg)`;
             }
         });
         
         alan.addEventListener('click', (e) => {
+            e.preventDefault();
+            
             if (mod === 'shooting' && animasyonID) {
                 atesEt();
             }
+        });
+        
+        alan.addEventListener('mousedown', (e) => {
+            e.preventDefault();
         });
         
         hareketModu.addEventListener('change', () => {
@@ -191,7 +201,7 @@
                 hedefX: hedefX,
                 hedefY: hedefY
             });
-            }
+        }
         
         function mermiHareketEttir() {
             for (let i = mermiler.length - 1; i >= 0; i--) {
