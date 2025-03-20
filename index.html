@@ -1,334 +1,114 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Görüntü İşlemcisi</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-            color: #333;
-        }
-        
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-        }
-        
-        h1 {
-            margin: 0;
-        }
-        
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-top: 30px;
-        }
-        
-        .upload-section {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .preview-section {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        
-        .preview-item {
-            flex: 1;
-            min-width: 300px;
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .btn {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        
-        .btn:hover {
-            background-color: #2980b9;
-        }
-        
-        .btn:disabled {
-            background-color: #95a5a6;
-            cursor: not-allowed;
-        }
-        
-        .image-preview {
-            width: 100%;
-            height: 300px;
-            border: 2px dashed #ddd;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-            overflow: hidden;
-        }
-        
-        .image-preview img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-        
-        .features {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 15px;
-        }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .output-video {
-            width: 100%;
-            max-height: 300px;
-            display: none;
-        }
-        
-        footer {
-            margin-top: 50px;
-            text-align: center;
-            padding: 20px;
-            background-color: #2c3e50;
-            color: white;
-        }
-        
-        /* Duyarlı tasarım */
-        @media (max-width: 768px) {
-            .preview-section {
-                flex-direction: column;
-            }
-            
-            .preview-item {
-                min-width: auto;
-            }
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <div class="container">
-            <h1>AI Görüntü İşlemcisi</h1>
-            <p>Resimlerinizi yükleyin, AI teknolojisiyle konuşturun ve canlandırın!</p>
-        </div>
-    </header>
+// Bu kod, GitHub Pages'te kullanmak için değil, bir backend servisi olan sunucuda çalıştırılmalıdır
+// Örneğin: Vercel, Netlify Functions, AWS Lambda, vb.
+
+// Sunucu tarafı API işleyicisi (server.js)
+async function processImage(imageData, processType) {
+  // Replicate API anahtarınız (güvenli bir şekilde saklanmalıdır)
+  const REPLICATE_API_TOKEN = "export REPLICATE_API_TOKEN=r8_DaGH3X3OjLHQvvc0BrENqv8qSqXhjcT0Lw0lw";
+  
+  // Base64 formatındaki resmi bir dosyaya dönüştürme
+  const imageBuffer = Buffer.from(
+    imageData.replace(/^data:image\/\w+;base64,/, ""),
+    "base64"
+  );
+  
+  // Geçici bir URL oluşturma (gerçek uygulamada bir depolama hizmeti kullanın)
+  const tempUrl = await uploadToTemporaryStorage(imageBuffer);
+  
+  // İşlem türüne göre farklı modeller kullanma
+  let modelEndpoint;
+  let input = { image: tempUrl };
+  
+  switch (processType) {
+    case 'animate':
+      // Resim animasyonu için model
+      modelEndpoint = "ytsf/motion-lora:2052a0265c4d9210196c23aa53a1245fbad6354d420e8c4256968f8eef9cdf57";
+      input.motion_bucket_id = 127; // Hareket düzeyi
+      break;
+    case 'talk':
+      // Konuşturma için model
+      modelEndpoint = "cjwbw/sadtalker:98384494a92adcbe8b1c615807155749279d7eea5297591eb1e3c43fcbaf31f9";
+      input.driven_audio = "https://example.com/demo-audio.mp3"; // Demo ses dosyası
+      break;
+    case 'video':
+      // Videoya dönüştürme için model
+      modelEndpoint = "stability-ai/stable-video-diffusion:3f0457e4619daac51203dedb472816fd4af51f3149fa7a9e0b5ffcf1b8172438";
+      input.num_frames = 25;
+      break;
+    default:
+      throw new Error("Geçersiz işlem türü");
+  }
+  
+  // Replicate API'yi çağırma
+  const response = await fetch(`https://api.replicate.com/v1/predictions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${REPLICATE_API_TOKEN}`,
+    },
+    body: JSON.stringify({
+      version: modelEndpoint,
+      input: input,
+    }),
+  });
+  
+  const prediction = await response.json();
+  
+  // Tahmin durumunu kontrol etme
+  let result = prediction;
+  if (prediction.status === "processing") {
+    // İşlem tamamlanana kadar bekleyin
+    result = await waitForCompletion(prediction.id, REPLICATE_API_TOKEN);
+  }
+  
+  return result.output;
+}
+
+// İşlemin tamamlanmasını bekleyen yardımcı fonksiyon
+async function waitForCompletion(predictionId, apiToken) {
+  let completed = false;
+  let result;
+  
+  while (!completed) {
+    const response = await fetch(`https://api.replicate.com/v1/predictions/${predictionId}`, {
+      headers: {
+        Authorization: `Token ${apiToken}`,
+      },
+    });
     
-    <div class="container">
-        <div class="main-content">
-            <div class="upload-section">
-                <h2>Resim Yükleme</h2>
-                <p>Dönüştürmek istediğiniz resmi seçin veya sürükleyip bırakın.</p>
-                
-                <div class="image-preview" id="imagePreview">
-                    <p>Resim önizlemesi burada görünecek</p>
-                </div>
-                
-                <input type="file" id="imageInput" accept="image/*" style="display: none;">
-                <button class="btn" id="uploadButton">Resim Seç</button>
-            </div>
-            
-            <div class="preview-section">
-                <div class="preview-item">
-                    <h2>İşlem Seçenekleri</h2>
-                    <p>Resminize uygulamak istediğiniz AI efektlerini seçin:</p>
-                    
-                    <div class="features">
-                        <button class="btn feature-btn" id="animateButton" disabled>Canlandır</button>
-                        <button class="btn feature-btn" id="talkButton" disabled>Konuştur</button>
-                        <button class="btn feature-btn" id="videoButton" disabled>Videoya Dönüştür</button>
-                    </div>
-                </div>
-                
-                <div class="preview-item">
-                    <h2>Sonuç</h2>
-                    <div id="outputContainer">
-                        <p id="noOutputText">İşlem sonucu burada görünecek</p>
-                        <video id="outputVideo" class="output-video" controls></video>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="loading" id="loadingIndicator">
-                <div class="loading-spinner"></div>
-                <p>İşleniyor... Lütfen bekleyin.</p>
-            </div>
-        </div>
-    </div>
+    result = await response.json();
     
-    <footer>
-        <div class="container">
-            <p>© 2025 AI Görüntü İşlemcisi. Tüm hakları saklıdır.</p>
-            <p>Not: Bu site, GitHub Pages üzerinde barındırılmaktadır.</p>
-        </div>
-    </footer>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const imageInput = document.getElementById('imageInput');
-            const uploadButton = document.getElementById('uploadButton');
-            const imagePreview = document.getElementById('imagePreview');
-            const animateButton = document.getElementById('animateButton');
-            const talkButton = document.getElementById('talkButton');
-            const videoButton = document.getElementById('videoButton');
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            const outputVideo = document.getElementById('outputVideo');
-            const noOutputText = document.getElementById('noOutputText');
-            
-            // Resim yükleme işlemi
-            uploadButton.addEventListener('click', function() {
-                imageInput.click();
-            });
-            
-            imageInput.addEventListener('change', function(e) {
-                if (e.target.files.length > 0) {
-                    const file = e.target.files[0];
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(event) {
-                        // Önizleme gösterme
-                        imagePreview.innerHTML = '';
-                        const img = document.createElement('img');
-                        img.src = event.target.result;
-                        imagePreview.appendChild(img);
-                        
-                        // Butonları etkinleştirme
-                        animateButton.disabled = false;
-                        talkButton.disabled = false;
-                        videoButton.disabled = false;
-                    };
-                    
-                    reader.readAsDataURL(file);
-                }
-            });
-            
-            // Sürükle-bırak desteği
-            imagePreview.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                imagePreview.style.borderColor = '#3498db';
-            });
-            
-            imagePreview.addEventListener('dragleave', function(e) {
-                e.preventDefault();
-                imagePreview.style.borderColor = '#ddd';
-            });
-            
-            imagePreview.addEventListener('drop', function(e) {
-                e.preventDefault();
-                imagePreview.style.borderColor = '#ddd';
-                
-                if (e.dataTransfer.files.length > 0) {
-                    const file = e.dataTransfer.files[0];
-                    if (file.type.match('image.*')) {
-                        imageInput.files = e.dataTransfer.files;
-                        
-                        const reader = new FileReader();
-                        reader.onload = function(event) {
-                            imagePreview.innerHTML = '';
-                            const img = document.createElement('img');
-                            img.src = event.target.result;
-                            imagePreview.appendChild(img);
-                            
-                            animateButton.disabled = false;
-                            talkButton.disabled = false;
-                            videoButton.disabled = false;
-                        };
-                        
-                        reader.readAsDataURL(file);
-                    }
-                }
-            });
-            
-            // Canlandırma simülasyonu
-            function processImage(action) {
-                // Yüklü resim var mı kontrol et
-                if (!imageInput.files.length) {
-                    alert('Lütfen önce bir resim yükleyin!');
-                    return;
-                }
-                
-                // Yükleme göstergesi
-                loadingIndicator.style.display = 'block';
-                noOutputText.style.display = 'none';
-                
-                // İşlem simülasyonu (gerçek uygulamada burada AI API'si kullanılır)
-                setTimeout(function() {
-                    loadingIndicator.style.display = 'none';
-                    outputVideo.style.display = 'block';
-                    
-                    // Farklı efekt türleri (örnek amaçlı)
-                    outputVideo.src = '/api/placeholder/400/320';
-                    
-                    // Sonuç açıklaması
-                    const actionTexts = {
-                        'animate': 'Resminiz canlandırıldı!',
-                        'talk': 'Resminiz konuşturuluyor...',
-                        'video': 'Resminiz videoya dönüştürüldü!'
-                    };
-                    
-                    noOutputText.textContent = actionTexts[action] + ' (Bu bir demo simülasyonudur)';
-                    noOutputText.style.display = 'block';
-                }, 2000);
-            }
-            
-            // Buton işlevleri
-            animateButton.addEventListener('click', function() {
-                processImage('animate');
-            });
-            
-            talkButton.addEventListener('click', function() {
-                processImage('talk');
-            });
-            
-            videoButton.addEventListener('click', function() {
-                processImage('video');
-            });
-        });
-    </script>
-</body>
-</html>
+    if (result.status === "succeeded" || result.status === "failed") {
+      completed = true;
+    } else {
+      // 1 saniye bekleyin ve tekrar kontrol edin
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+  
+  return result;
+}
+
+// Geçici depolama fonksiyonu (gerçek uygulamada AWS S3, Firebase Storage vb. kullanın)
+async function uploadToTemporaryStorage(imageBuffer) {
+  // Burada gerçek bir depolama servisi kullanmanız gerekir
+  // Bu sadece bir örnek
+  const uploadResponse = await someStorageService.upload(imageBuffer);
+  return uploadResponse.url;
+}
+
+// Bu fonksiyonu API endpoint olarak dışa aktarın
+// Örneğin, Vercel serverless function olarak:
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+  
+  try {
+    const { imageData, processType } = req.body;
+    const result = await processImage(imageData, processType);
+    return res.status(200).json({ result });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
