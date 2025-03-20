@@ -1,114 +1,198 @@
-// Bu kod, GitHub Pages'te kullanmak için değil, bir backend servisi olan sunucuda çalıştırılmalıdır
-// Örneğin: Vercel, Netlify Functions, AWS Lambda, vb.
-
-// Sunucu tarafı API işleyicisi (server.js)
-async function processImage(imageData, processType) {
-  // Replicate API anahtarınız (güvenli bir şekilde saklanmalıdır)
-  const REPLICATE_API_TOKEN = "export REPLICATE_API_TOKEN=r8_DaGH3X3OjLHQvvc0BrENqv8qSqXhjcT0Lw0lw";
-  
-  // Base64 formatındaki resmi bir dosyaya dönüştürme
-  const imageBuffer = Buffer.from(
-    imageData.replace(/^data:image\/\w+;base64,/, ""),
-    "base64"
-  );
-  
-  // Geçici bir URL oluşturma (gerçek uygulamada bir depolama hizmeti kullanın)
-  const tempUrl = await uploadToTemporaryStorage(imageBuffer);
-  
-  // İşlem türüne göre farklı modeller kullanma
-  let modelEndpoint;
-  let input = { image: tempUrl };
-  
-  switch (processType) {
-    case 'animate':
-      // Resim animasyonu için model
-      modelEndpoint = "ytsf/motion-lora:2052a0265c4d9210196c23aa53a1245fbad6354d420e8c4256968f8eef9cdf57";
-      input.motion_bucket_id = 127; // Hareket düzeyi
-      break;
-    case 'talk':
-      // Konuşturma için model
-      modelEndpoint = "cjwbw/sadtalker:98384494a92adcbe8b1c615807155749279d7eea5297591eb1e3c43fcbaf31f9";
-      input.driven_audio = "https://example.com/demo-audio.mp3"; // Demo ses dosyası
-      break;
-    case 'video':
-      // Videoya dönüştürme için model
-      modelEndpoint = "stability-ai/stable-video-diffusion:3f0457e4619daac51203dedb472816fd4af51f3149fa7a9e0b5ffcf1b8172438";
-      input.num_frames = 25;
-      break;
-    default:
-      throw new Error("Geçersiz işlem türü");
-  }
-  
-  // Replicate API'yi çağırma
-  const response = await fetch(`https://api.replicate.com/v1/predictions`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Token ${REPLICATE_API_TOKEN}`,
-    },
-    body: JSON.stringify({
-      version: modelEndpoint,
-      input: input,
-    }),
-  });
-  
-  const prediction = await response.json();
-  
-  // Tahmin durumunu kontrol etme
-  let result = prediction;
-  if (prediction.status === "processing") {
-    // İşlem tamamlanana kadar bekleyin
-    result = await waitForCompletion(prediction.id, REPLICATE_API_TOKEN);
-  }
-  
-  return result.output;
-}
-
-// İşlemin tamamlanmasını bekleyen yardımcı fonksiyon
-async function waitForCompletion(predictionId, apiToken) {
-  let completed = false;
-  let result;
-  
-  while (!completed) {
-    const response = await fetch(`https://api.replicate.com/v1/predictions/${predictionId}`, {
-      headers: {
-        Authorization: `Token ${apiToken}`,
-      },
-    });
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Benzeri Resim Hareketi</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        
+        .container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            background-color: #f5f5f5;
+            overflow: hidden;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        
+        .resim {
+            position: absolute;
+            width: 350px;
+            height: auto;
+            transition: transform 0.2s ease-out;
+        }
+        
+        .kontrol-panel {
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 10px 15px;
+            margin-right: 10px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #3367d6;
+        }
+        
+        .mode-select {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI Benzeri Resim Hareketi</h1>
     
-    result = await response.json();
+    <div class="container" id="hareketAlani">
+        <img src="image.png"Hareketli Resim" class="resim" id="hareketliResim">
+    </div>
     
-    if (result.status === "succeeded" || result.status === "failed") {
-      completed = true;
-    } else {
-      // 1 saniye bekleyin ve tekrar kontrol edin
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-  }
-  
-  return result;
-}
+    <div class="kontrol-panel">
+        <button id="baslatBtn">Başlat</button>
+        <button id="durdurBtn">Durdur</button>
+        
+        <div class="mode-select">
+            <label for="hareketModu">Hareket Modu:</label>
+            <select id="hareketModu">
+                <option value="random">Rastgele Hareket</option>
+                <option value="circular">Dairesel Hareket</option>
+                <option value="zigzag">Zigzag Hareket</option>
+                <option value="follow">Fare Takibi</option>
+            </select>
+        </div>
+    </div>
 
-// Geçici depolama fonksiyonu (gerçek uygulamada AWS S3, Firebase Storage vb. kullanın)
-async function uploadToTemporaryStorage(imageBuffer) {
-  // Burada gerçek bir depolama servisi kullanmanız gerekir
-  // Bu sadece bir örnek
-  const uploadResponse = await someStorageService.upload(imageBuffer);
-  return uploadResponse.url;
-}
-
-// Bu fonksiyonu API endpoint olarak dışa aktarın
-// Örneğin, Vercel serverless function olarak:
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-  
-  try {
-    const { imageData, processType } = req.body;
-    const result = await processImage(imageData, processType);
-    return res.status(200).json({ result });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-}
+    <script>
+        const resim = document.getElementById('hareketliResim');
+        const alan = document.getElementById('hareketAlani');
+        const baslatBtn = document.getElementById('baslatBtn');
+        const durdurBtn = document.getElementById('durdurBtn');
+        const hareketModu = document.getElementById('hareketModu');
+        
+        let x = 100;
+        let y = 100;
+        let hizX = 3;
+        let hizY = 2;
+        let angle = 0;
+        let animasyonID = null;
+        let mod = 'random';
+        let takipEt = false;
+        let fareX = 0;
+        let fareY = 0;
+        
+        resim.style.left = x + 'px';
+        resim.style.top = y + 'px';
+        
+        alan.addEventListener('mousemove', (e) => {
+            const rect = alan.getBoundingClientRect();
+            fareX = e.clientX - rect.left;
+            fareY = e.clientY - rect.top;
+        });
+        
+        hareketModu.addEventListener('change', () => {
+            mod = hareketModu.value;
+        });
+        
+        function rastgeleHareket() {
+            if (Math.random() < 0.05) {
+                hizX = (Math.random() - 0.5) * 8;
+                hizY = (Math.random() - 0.5) * 8;
+            }
+            
+            x += hizX;
+            y += hizY;
+            
+            const maxX = alan.clientWidth - resim.width;
+            const maxY = alan.clientHeight - resim.height;
+            
+            if (x <= 0 || x >= maxX) {
+                hizX = -hizX;
+                x = Math.max(0, Math.min(x, maxX));
+            }
+            
+            if (y <= 0 || y >= maxY) {
+                hizY = -hizY;
+                y = Math.max(0, Math.min(y, maxY));
+            }
+        }
+        
+        function daireselHareket() {
+            const centerX = alan.clientWidth / 2 - resim.width / 2;
+            const centerY = alan.clientHeight / 2 - resim.height / 2;
+            const radius = Math.min(alan.clientWidth, alan.clientHeight) / 4;
+            
+            angle += 0.02;
+            x = centerX + Math.cos(angle) * radius;
+            y = centerY + Math.sin(angle) * radius;
+        }
+        
+        function zigzagHareket() {
+            x += hizX;
+            
+            const maxX = alan.clientWidth - resim.width;
+            
+            if (x <= 0 || x >= maxX) {
+                hizX = -hizX;
+                x = Math.max(0, Math.min(x, maxX));
+                y = Math.random() * (alan.clientHeight - resim.height);
+            }
+        }
+        
+        function fareTakip() {
+            const dx = fareX - x - resim.width / 2;
+            const dy = fareY - y - resim.height / 2;
+            
+            x += dx * 0.05;
+            y += dy * 0.05;
+        }
+        
+        function animate() {
+            switch (mod) {
+                case 'random':
+                    rastgeleHareket();
+                    break;
+                case 'circular':
+                    daireselHareket();
+                    break;
+                case 'zigzag':
+                    zigzagHareket();
+                    break;
+                case 'follow':
+                    fareTakip();
+                    break;
+            }
+            
+            resim.style.left = x + 'px';
+            resim.style.top = y + 'px';
+            
+            resim.style.transform = `rotate(${Math.sin(Date.now() / 1000) * 5}deg)`;
+            
+            animasyonID = requestAnimationFrame(animate);
+        }
+        
+        baslatBtn.addEventListener('click', () => {
+            if (!animasyonID) {
+                animasyonID = requestAnimationFrame(animate);
+            }
+        });
+        
+        durdurBtn.addEventListener('click', () => {
+            if (animasyonID) {
+                cancelAnimationFrame(animasyonID);
+                animasyonID = null;
+            }
+        });
+    </script>
+</body>
+</html>
