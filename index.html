@@ -276,15 +276,43 @@
         });
         
         // Müzik switch kontrol
-        muzikSwitch.addEventListener('change', () => {
-            if (muzikSwitch.checked) {
-                muzikDegistir(karakterSec.value);
-            } else {
-                muzik1.pause();
-                muzik2.pause();
-                muzik3.pause();
-            }
-        });
+       muzikSwitch.addEventListener('change', () => {
+    if (muzikSwitch.checked) {
+        muzikDegistir(karakterSec.value);
+    } else {
+        // Tüm müzikleri durdur
+        muzik1.pause();
+        muzik2.pause();
+        muzik3.pause();
+        // Aktif müziği null olarak ayarlama
+        aktifMuzik = null;
+    }
+});
+
+// muzikDegistir fonksiyonunu da güncelle
+function muzikDegistir(karakterDeger) {
+    // Önce tüm müzikleri durdur
+    muzik1.pause();
+    muzik2.pause();
+    muzik3.pause();
+    
+    // Karakter seçimine göre müzik çal
+    if (muzikSwitch.checked) {  // Bu kontrol önemli
+        if (karakterDeger === 'image.png') {
+            muzik1.currentTime = 0;
+            muzik1.play();
+            aktifMuzik = muzik1;
+        } else if (karakterDeger === 'image1.png') {
+            muzik2.currentTime = 0;
+            muzik2.play();
+            aktifMuzik = muzik2;
+        } else if (karakterDeger === 'image3.jpeg') {
+            muzik3.currentTime = 0;
+            muzik3.play();
+            aktifMuzik = muzik3;
+        }
+    }
+}
         
         resim.addEventListener('mousedown', function(e) {
             e.preventDefault();
