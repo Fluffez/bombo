@@ -87,6 +87,11 @@
         
         .mode-select {
             margin-left: 10px;
+            margin-right: 10px;
+        }
+        
+        .character-select {
+            margin-left: 10px;
         }
     </style>
 </head>
@@ -112,6 +117,17 @@
                 <option value="shooting">Ateş Etme</option>
             </select>
         </div>
+        
+        <div class="character-select">
+            <label for="karakterSec">Karakter Seç:</label>
+            <select id="karakterSec">
+                <option value="image.png">Kürt1</option>
+                <option value="image1.png">Kürt2</option>
+                <option value="image3.jpeg">Kürt2</option>
+                <option value="karakter3.png">Karakter 3</option>
+                <option value="karakter4.png">Karakter 4</option>
+            </select>
+        </div>
     </div>
 
     <script>
@@ -120,6 +136,7 @@
         const baslatBtn = document.getElementById('baslatBtn');
         const durdurBtn = document.getElementById('durdurBtn');
         const hareketModu = document.getElementById('hareketModu');
+        const karakterSec = document.getElementById('karakterSec');
         const silahResim = document.getElementById('silahResim');
         
         let x = 100;
@@ -172,6 +189,11 @@
             } else {
                 silahResim.style.display = 'none';
             }
+        });
+        
+        karakterSec.addEventListener('change', () => {
+            const seciliKarakter = karakterSec.value;
+            resim.src = seciliKarakter;
         });
         
         function atesEt() {
