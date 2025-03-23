@@ -199,6 +199,11 @@
                 <option value="image3.jpeg">BOMBARDINO CROCODILO</option>
             </select>
         </div>
+        
+        <!-- Müzik düğmesini kontrol paneline taşıyalım -->
+        <div class="muzik-buton" style="margin-left: 15px;">
+            <button id="muzikBtn">Müziği Aç/Kapat</button>
+        </div>
     </div>
     
     <!-- Müzik elementleri -->
@@ -221,13 +226,14 @@
         const karakterSec = document.getElementById('karakterSec');
         const silahResim = document.getElementById('silahResim');
         const muzikSwitch = document.getElementById('muzikSwitch');
+        const muzikBtn = document.getElementById('muzikBtn');
         
         // Müzik elementleri
         const muzik1 = document.getElementById('muzik1');
         const muzik2 = document.getElementById('muzik2');
         const muzik3 = document.getElementById('muzik3');
         let aktifMuzik = null;
-        let muzikAktif = muzikSwitch.checked; // Müzik durumunu sakla
+        let muzikAktif = true; // Başlangıçta müzik açık
         
         let x = 100;
         let y = 100;
@@ -244,50 +250,72 @@
         resim.style.left = x + 'px';
         resim.style.top = y + 'px';
         
-        // Müzik fonksiyonları
-        function muzikDegistir(karakterDeger) {
-            // Önce tüm müzikleri durdur
+        // Tüm müzikleri durdur
+        function muzikleriDurdur() {
             muzik1.pause();
             muzik2.pause();
             muzik3.pause();
+            aktifMuzik = null;
+        }
+        
+        // Müzik fonksiyonları
+        function muzikDegistir(karakterDeger) {
+            // Önce tüm müzikleri durdur
+            muzikleriDurdur();
             
             // Karakter seçimine göre müzik çal
-            if (muzikAktif) {
+            if (muzikAktif && animasyonID) {
                 if (karakterDeger === 'image.png') {
                     muzik1.currentTime = 0;
-                    muzik1.play();
+                    muzik1.play().catch(e => console.log("Müzik çalma hatası:", e));
                     aktifMuzik = muzik1;
                 } else if (karakterDeger === 'image1.png') {
                     muzik2.currentTime = 0;
-                    muzik2.play();
+                    muzik2.play().catch(e => console.log("Müzik çalma hatası:", e));
                     aktifMuzik = muzik2;
                 } else if (karakterDeger === 'image3.jpeg') {
                     muzik3.currentTime = 0;
-                    muzik3.play();
+                    muzik3.play().catch(e => console.log("Müzik çalma hatası:", e));
                     aktifMuzik = muzik3;
                 }
             }
         }
         
-        // Sayfa yüklendiğinde varsayılan karakterin müziğini kontrol
-        document.addEventListener('DOMContentLoaded', () => {
-            muzikAktif = muzikSwitch.checked;
+        // Müzik düğmesi kontrolü - Switch'e alternatif olarak
+        muzikBtn.addEventListener('click', () => {
+            muzikAktif = !muzikAktif;
+            muzikSwitch.checked = muzikAktif;
+            
+            if (muzikAktif) {
+                if (animasyonID) {
+                    muzikDegistir(karakterSec.value);
+                }
+                muzikBtn.textContent = "Müziği Kapat";
+            } else {
+                muzikleriDurdur();
+                muzikBtn.textContent = "Müziği Aç";
+            }
         });
         
-        // Müzik switch kontrol
+        // Müzik switch kontrolü
         muzikSwitch.addEventListener('change', () => {
             muzikAktif = muzikSwitch.checked;
             
             if (muzikAktif) {
-                if (animasyonID) { // Eğer animasyon çalışıyorsa müziği çal
+                if (animasyonID) {
                     muzikDegistir(karakterSec.value);
                 }
+                muzikBtn.textContent = "Müziği Kapat";
             } else {
-                muzik1.pause();
-                muzik2.pause();
-                muzik3.pause();
-                aktifMuzik = null;
+                muzikleriDurdur();
+                muzikBtn.textContent = "Müziği Aç";
             }
+        });
+        
+        // Sayfa yüklendiğinde düğme metnini ayarla
+        document.addEventListener('DOMContentLoaded', () => {
+            muzikAktif = muzikSwitch.checked;
+            muzikBtn.textContent = muzikAktif ? "Müziği Kapat" : "Müziği Aç";
         });
         
         resim.addEventListener('mousedown', function(e) {
@@ -377,7 +405,6 @@
                 
                 const mermiRect = mermi.element.getBoundingClientRect();
                 const resimRect = resim.getBoundingClientRect();
-                const alanRect = alan.getBoundingClientRect();
                 
                 const hit = !(
                     mermiRect.right < resimRect.left || 
@@ -511,9 +538,7 @@
                 animasyonID = null;
                 
                 // Durdur düğmesine basıldığında müziği durdur
-                muzik1.pause();
-                muzik2.pause();
-                muzik3.pause();
+                muzikleriDurdur();
             }
         });
     </script>
