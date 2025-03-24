@@ -49,6 +49,7 @@
             transform-origin: center;
             pointer-events: none;
             user-select: none;
+            transition: transform 0.1s ease-out;
         }
         
         .mermi {
@@ -59,6 +60,7 @@
             border-radius: 5px;
             z-index: 5;
             transform-origin: center;
+            box-shadow: 0 0 5px rgba(255, 87, 34, 0.7);
         }
         
         .kontrol-panel {
@@ -204,6 +206,9 @@
         <div class="muzik-buton" style="margin-left: 15px;">
             <button id="muzikBtn">Müziği Aç/Kapat</button>
         </div>
+        
+        <!-- Silah perspektifi butonu -->
+        <button id="silahPerspektifBtn">3D Moda Geç</button>
     </div>
     
     <!-- Müzik elementleri -->
@@ -227,6 +232,11 @@
         const silahResim = document.getElementById('silahResim');
         const muzikSwitch = document.getElementById('muzikSwitch');
         const muzikBtn = document.getElementById('muzikBtn');
+        const silahPerspektifBtn = document.getElementById('silahPerspektifBtn');
+        
+        // Silah perspektifi için değişkenler
+        let silahPerspektif = '2d'; // Başlangıçta 2D
+        let silahAci = 0;
         
         // Müzik elementleri
         const muzik1 = document.getElementById('muzik1');
@@ -249,6 +259,19 @@
         
         resim.style.left = x + 'px';
         resim.style.top = y + 'px';
+        
+        // Silah perspektif değiştirme olayı
+        silahPerspektifBtn.addEventListener('click', () => {
+            silahPerspektif = silahPerspektif === '2d' ? '3d' : '2d';
+            silahPerspektifBtn.textContent = silahPerspektif === '2d' ? '3D Moda Geç' : '2D Moda Geç';
+            
+            // Perspektif değişimi görsel efekti
+            if (silahPerspektif === '3d') {
+                silahResim.style.transform = 'perspective(500px) rotateY(15deg) rotate(' + silahAci + 'deg)';
+            } else {
+                silahResim.style.transform = 'rotate(' + silahAci + 'deg)';
+            }
+        });
         
         // Tüm müzikleri durdur
         function muzikleriDurdur() {
@@ -328,8 +351,24 @@
             fareY = e.clientY - rect.top;
             
             if (mod === 'shooting') {
+                // Silahın farenin konumunu takip etmesi
                 silahResim.style.left = (fareX - silahResim.width / 2) + 'px';
                 silahResim.style.top = (fareY - silahResim.height / 2) + 'px';
+                
+                // Silahın hedefin olduğu yöne bakması için açıyı hesapla
+                const silahX = parseFloat(silahResim.style.left) + silahResim.width / 2;
+                const silahY = parseFloat(silahResim.style.top) + silahResim.height / 2;
+                const hedefX = x + resim.width / 2;
+                const hedefY = y + resim.height / 2;
+                
+                silahAci = Math.atan2(hedefY - silahY, hedefX - silahX) * 180 / Math.PI;
+                
+                // Perspektife göre dönüşüm uygula
+                if (silahPerspektif === '3d') {
+                    silahResim.style.transform = 'perspective(500px) rotateY(15deg) rotate(' + silahAci + 'deg)';
+                } else {
+                    silahResim.style.transform = 'rotate(' + silahAci + 'deg)';
+                }
             }
         });
         
@@ -369,27 +408,23 @@
             mermi.className = 'mermi';
             alan.appendChild(mermi);
             
-            const hedefX = x + resim.width / 2;
-            const hedefY = y + resim.height / 2;
-            
             const baslangicX = parseFloat(silahResim.style.left) + silahResim.width / 2;
             const baslangicY = parseFloat(silahResim.style.top) + silahResim.height / 2;
             
-            const aci = Math.atan2(hedefY - baslangicY, hedefX - baslangicX);
+            // Silahın baktığı yöne (açısına) göre mermi ateşle
+            const aci = silahAci * Math.PI / 180;
             const hiz = 12;
             
             mermi.style.left = baslangicX + 'px';
             mermi.style.top = baslangicY + 'px';
-            mermi.style.transform = `rotate(${aci * 180 / Math.PI}deg)`;
+            mermi.style.transform = `rotate(${aci}rad)`;
             
             mermiler.push({
                 element: mermi,
                 x: baslangicX,
                 y: baslangicY,
                 hizX: Math.cos(aci) * hiz,
-                hizY: Math.sin(aci) * hiz,
-                hedefX: hedefX,
-                hedefY: hedefY
+                hizY: Math.sin(aci) * hiz
             });
         }
         
