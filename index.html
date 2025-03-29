@@ -260,19 +260,6 @@
         resim.style.left = x + 'px';
         resim.style.top = y + 'px';
         
-        // Silah perspektif değiştirme olayı
-        silahPerspektifBtn.addEventListener('click', () => {
-            silahPerspektif = silahPerspektif === '2d' ? '3d' : '2d';
-            silahPerspektifBtn.textContent = silahPerspektif === '2d' ? '3D Moda Geç' : '2D Moda Geç';
-            
-            // Perspektif değişimi görsel efekti
-            if (silahPerspektif === '3d') {
-                silahResim.style.transform = 'perspective(500px) rotateY(15deg) rotate(' + silahAci + 'deg)';
-            } else {
-                silahResim.style.transform = 'rotate(' + silahAci + 'deg)';
-            }
-        });
-        
         // Tüm müzikleri durdur
         function muzikleriDurdur() {
             muzik1.pause();
