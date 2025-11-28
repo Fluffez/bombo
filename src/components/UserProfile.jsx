@@ -39,7 +39,7 @@ export default function UserProfile({ user }) {
       {/* Profile Header */}
       <div className="flex items-center gap-4 mb-6">
         <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-          {user?.name.charAt(0).toUpperCase()}
+          {user?.name ? user.name.charAt(0).toUpperCase() : '?'}
         </div>
         <div className="flex-1">
           <h2 className="text-xl font-bold text-white">{user?.name}</h2>
