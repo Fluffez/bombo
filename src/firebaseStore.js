@@ -146,6 +146,7 @@ export const useFirebaseStore = create((set) => ({
   // User Functions
   fetchUserData: async (uid) => {
     try {
+      if (!uid) return null
       const userDoc = await getDocs(query(collection(db, 'users'), where('uid', '==', uid)))
       if (!userDoc.empty) {
         return userDoc.docs[0].data()
@@ -183,9 +184,8 @@ export const useFirebaseStore = create((set) => ({
 
   // Auth state listener
   initAuthListener: () => {
-    onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, (user) => {
       if (user) {
-        const userData = await useFirebaseStore.getState().fetchUserData(user.uid)
         set({ currentUser: user, loading: false })
       } else {
         set({ currentUser: null, loading: false })
