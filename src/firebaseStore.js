@@ -92,6 +92,11 @@ export const useFirebaseStore = create((set) => ({
   users: [],
   loading: true,
   error: null,
+  language: localStorage.getItem('language') || 'tr',
+  setLanguage: (lang) => {
+    localStorage.setItem('language', lang)
+    set({ language: lang })
+  },
 
   // Auth Functions
   register: async (email, password, name, height, weight, age) => {
