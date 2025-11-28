@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useFirebaseStore } from '../firebaseStore'
-import { Mail, Lock, User, Ruler, Dumbbell, Cake } from 'lucide-react'
 
 export default function AuthPage() {
   const { register, login, loading, error } = useFirebaseStore()
@@ -42,155 +41,114 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-block w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center mb-4">
-            <span className="text-4xl">💪</span>
-          </div>
-          <h1 className="text-4xl font-bold text-white mb-2">Bombo</h1>
-          <p className="text-gray-400">Advanced Workout Tracker</p>
-        </div>
+        <div className="bg-white rounded-lg shadow-md p-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center">Welcome to Bombo</h1>
+          <p className="text-gray-600 text-center mb-8 text-sm">Advanced Workout Tracker</p>
 
-        {/* Form Card */}
-        <div className="bg-gradient-to-br from-gray-800 to-gray-900 border border-orange-500/30 rounded-xl p-8 mb-6">
-          <h2 className="text-2xl font-bold text-white mb-6 text-center">
-            {isLogin ? 'Giriş Yap' : 'Hesap Oluştur'}
-          </h2>
-
-          {/* Error Message */}
           {(localError || error) && (
-            <div className="mb-4 p-4 bg-red-600/20 border border-red-500/50 rounded-lg">
-              <p className="text-red-400 text-sm">{localError || error}</p>
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded">
+              <p className="text-red-600 text-sm">{localError || error}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 text-gray-500" size={18} />
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="your@email.com"
-                  className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 transition-colors"
-                  required
-                />
-              </div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email address</label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="Enter email"
+                className="w-full px-4 py-2 border border-gray-300 rounded text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                required
+              />
             </div>
 
-            {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Şifre</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 text-gray-500" size={18} />
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 transition-colors"
-                  required
-                />
-              </div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+              <input
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                placeholder="Password"
+                className="w-full px-4 py-2 border border-gray-300 rounded text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                required
+              />
             </div>
 
-            {/* Register Fields */}
             {!isLogin && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Ad Soyad</label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 text-gray-500" size={18} />
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="Adınız"
-                      className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 transition-colors"
-                    />
-                  </div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Your name"
+                    className="w-full px-4 py-2 border border-gray-300 rounded text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Boy (cm)</label>
-                    <div className="relative">
-                      <Ruler className="absolute left-2 top-2 text-gray-500" size={16} />
-                      <input
-                        type="number"
-                        value={formData.height}
-                        onChange={(e) => setFormData({ ...formData, height: e.target.value })}
-                        placeholder="188"
-                        className="w-full pl-8 pr-2 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 transition-colors"
-                      />
-                    </div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Height (cm)</label>
+                    <input
+                      type="number"
+                      value={formData.height}
+                      onChange={(e) => setFormData({ ...formData, height: e.target.value })}
+                      placeholder="188"
+                      className="w-full px-3 py-2 border border-gray-300 rounded text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Kilo (kg)</label>
-                    <div className="relative">
-                      <Dumbbell className="absolute left-2 top-2 text-gray-500" size={16} />
-                      <input
-                        type="number"
-                        value={formData.weight}
-                        onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                        placeholder="76"
-                        className="w-full pl-8 pr-2 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 transition-colors"
-                      />
-                    </div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Weight (kg)</label>
+                    <input
+                      type="number"
+                      value={formData.weight}
+                      onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                      placeholder="76"
+                      className="w-full px-3 py-2 border border-gray-300 rounded text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Yaş</label>
-                    <div className="relative">
-                      <Cake className="absolute left-2 top-2 text-gray-500" size={16} />
-                      <input
-                        type="number"
-                        value={formData.age}
-                        onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                        placeholder="Opsiyonel"
-                        className="w-full pl-8 pr-2 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 transition-colors"
-                      />
-                    </div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Age</label>
+                    <input
+                      type="number"
+                      value={formData.age}
+                      onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                      placeholder="Optional"
+                      className="w-full px-3 py-2 border border-gray-300 rounded text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
                   </div>
                 </div>
               </>
             )}
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2 px-4 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 disabled:opacity-50 text-white font-semibold rounded-lg transition-all duration-300 mt-6"
+              className="w-full py-2 px-4 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-semibold rounded transition-colors mt-6"
             >
-              {loading ? 'Yükleniyor...' : isLogin ? 'Giriş Yap' : 'Hesap Oluştur'}
+              {loading ? 'Loading...' : isLogin ? 'Login' : 'Create Account'}
             </button>
-          </form>
 
-          {/* Toggle */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-400 text-sm">
-              {isLogin ? 'Hesabın yok mu?' : 'Zaten hesabın var mı?'}{' '}
+            <div className="text-center text-sm text-gray-600 mt-4">
+              {isLogin ? "Don't have an account? " : 'Already have an account? '}
               <button
+                type="button"
                 onClick={() => {
                   setIsLogin(!isLogin)
                   setLocalError('')
                   setFormData({ email: '', password: '', name: '', height: '', weight: '', age: '' })
                 }}
-                className="text-orange-400 hover:text-orange-300 font-semibold transition-colors"
+                className="text-blue-500 hover:text-blue-600 font-medium"
               >
-                {isLogin ? 'Kaydol' : 'Giriş Yap'}
+                {isLogin ? 'Register' : 'Login'}
               </button>
-            </p>
-          </div>
-        </div>
-
-        {/* Info */}
-        <div className="text-center text-gray-400 text-xs">
-          <p>🔒 Verileriniz Firebase ile güvenli şekilde saklanır</p>
+            </div>
+          </form>
         </div>
       </div>
     </div>
