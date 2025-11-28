@@ -1,14 +1,36 @@
-import React, { useState } from 'react'
-import { useStore } from '../store'
+import React, { useState, useEffect } from 'react'
+import { useFirebaseStore } from '../firebaseStore'
 import WorkoutDay from './WorkoutDay'
 import { Calendar } from 'lucide-react'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 export default function WorkoutView({ user }) {
+  const { fetchUserData } = useFirebaseStore()
   const [selectedDay, setSelectedDay] = useState('Monday')
+  const [userData, setUserData] = useState(null)
+  const [loading, setLoading] = useState(true)
 
-  if (!user?.program) {
+  useEffect(() => {
+    if (user?.uid) {
+      fetchUserData(user.uid).then((data) => {
+        if (data) {
+          setUserData(data)
+        }
+        setLoading(false)
+      })
+    }
+  }, [user?.uid, fetchUserData])
+
+  if (loading) {
+    return (
+      <div className="bg-gradient-to-br from-gray-800 to-gray-900 border border-orange-500/30 rounded-xl p-8 text-center">
+        <p className="text-gray-400">Loading...</p>
+      </div>
+    )
+  }
+
+  if (!userData?.program) {
     return (
       <div className="bg-gradient-to-br from-gray-800 to-gray-900 border border-orange-500/30 rounded-xl p-8 text-center">
         <p className="text-gray-400">No program available</p>
@@ -16,7 +38,7 @@ export default function WorkoutView({ user }) {
     )
   }
 
-  const todayExercises = user.program[selectedDay] || []
+  const todayExercises = userData.program[selectedDay] || []
 
   return (
     <div className="space-y-6">
@@ -44,7 +66,7 @@ export default function WorkoutView({ user }) {
       </div>
 
       {/* Workout for Selected Day */}
-      <WorkoutDay day={selectedDay} exercises={todayExercises} user={user} />
+      <WorkoutDay day={selectedDay} exercises={todayExercises} user={userData} />
     </div>
   )
 }
