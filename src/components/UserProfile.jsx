@@ -3,22 +3,30 @@ import { useFirebaseStore } from '../firebaseStore'
 import { Edit2, Save, X } from 'lucide-react'
 
 export default function UserProfile({ user }) {
-  const { updateUserStats } = useFirebaseStore()
+  const { updateUserStats, fetchUserData } = useFirebaseStore()
+  const [userData, setUserData] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
   const [stats, setStats] = useState({
-    height: user?.height || '',
-    weight: user?.weight || '',
-    age: user?.age || ''
+    height: '',
+    weight: '',
+    age: ''
   })
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    setStats({
-      height: user?.height || '',
-      weight: user?.weight || '',
-      age: user?.age || ''
-    })
-  }, [user])
+    if (user?.uid) {
+      fetchUserData(user.uid).then((data) => {
+        if (data) {
+          setUserData(data)
+          setStats({
+            height: data.height || '',
+            weight: data.weight || '',
+            age: data.age || ''
+          })
+        }
+      })
+    }
+  }, [user?.uid, fetchUserData])
 
   const handleSave = async () => {
     try {
@@ -32,17 +40,17 @@ export default function UserProfile({ user }) {
     }
   }
 
-  const bmi = user ? (user.weight / ((user.height / 100) ** 2)).toFixed(1) : 0
+  const bmi = userData && userData.weight && userData.height ? (userData.weight / ((userData.height / 100) ** 2)).toFixed(1) : 0
 
   return (
     <div className="bg-gradient-to-br from-gray-800 to-gray-900 border border-orange-500/30 rounded-xl p-6 sticky top-24">
       {/* Profile Header */}
       <div className="flex items-center gap-4 mb-6">
         <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-          {user?.name ? user.name.charAt(0).toUpperCase() : '?'}
+          {userData?.name ? userData.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || '?'}
         </div>
         <div className="flex-1">
-          <h2 className="text-xl font-bold text-white">{user?.name}</h2>
+          <h2 className="text-xl font-bold text-white">{userData?.name || user?.email}</h2>
           <p className="text-sm text-gray-400">{user?.email}</p>
         </div>
       </div>
@@ -52,20 +60,20 @@ export default function UserProfile({ user }) {
         <div className="space-y-4 mb-6">
           <div className="bg-gray-700/50 rounded-lg p-4">
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Boy</p>
-            <p className="text-2xl font-bold text-orange-400">{user?.height} cm</p>
+            <p className="text-2xl font-bold text-orange-400">{userData?.height || '-'} cm</p>
           </div>
           <div className="bg-gray-700/50 rounded-lg p-4">
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Kilo</p>
-            <p className="text-2xl font-bold text-orange-400">{user?.weight} kg</p>
+            <p className="text-2xl font-bold text-orange-400">{userData?.weight || '-'} kg</p>
           </div>
           <div className="bg-gray-700/50 rounded-lg p-4">
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">BMI</p>
             <p className="text-2xl font-bold text-orange-400">{bmi}</p>
           </div>
-          {user?.age && (
+          {userData?.age && (
             <div className="bg-gray-700/50 rounded-lg p-4">
               <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Yaş</p>
-              <p className="text-2xl font-bold text-orange-400">{user.age}</p>
+              <p className="text-2xl font-bold text-orange-400">{userData.age}</p>
             </div>
           )}
         </div>
