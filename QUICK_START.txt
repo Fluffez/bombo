@@ -1,0 +1,150 @@
+╔════════════════════════════════════════════════════════════════════╗
+║                    BOMBO - QUICK START GUIDE                        ║
+║              Advanced Workout Tracker with Firebase                 ║
+╚════════════════════════════════════════════════════════════════════╝
+
+🚀 ADIM 1: YERİ GELIŞTIRME (5 dakika)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Terminal'i aç
+2. Proje klasörüne git:
+   cd c:\Users\kapta\Downloads\wind
+
+3. Development sunucusunu başlat:
+   npm run dev
+
+4. Tarayıcı otomatik açılacak: http://localhost:3000
+
+✅ Yerel geliştirme hazır!
+
+
+🔥 ADIM 2: FIREBASE KURULUMU (10 dakika)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. https://console.firebase.google.com adresine git
+2. Google hesabınla giriş yap
+3. "Proje Oluştur" butonuna tıkla
+4. Proje adı: "bombo-workout"
+5. Devam et ve projeyi oluştur
+
+6. Web uygulaması ekle:
+   - "Oluştur" > "Web" seçeneğini tıkla
+   - Uygulama adı: "bombo"
+   - Firebase config'i kopyala
+
+7. Firestore Database oluştur:
+   - "Firestore Database" > "Veritabanı Oluştur"
+   - Bölge: europe-west1
+   - Güvenlik: "Test modunda başla"
+
+8. Authentication etkinleştir:
+   - "Authentication" > "Başlat"
+   - "Email/Şifre" sağlayıcısını etkinleştir
+
+✅ Firebase hazır!
+
+
+📝 ADIM 3: CREDENTIALS EKLE (2 dakika)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. ".env.local" dosyasını aç (proje klasöründe)
+2. Firebase config'i yapıştır:
+
+VITE_FIREBASE_API_KEY=your_key
+VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+
+3. Dosyayı kaydet
+4. Development sunucusunu yeniden başlat (Ctrl+C, npm run dev)
+
+✅ Credentials eklendi!
+
+
+🌐 ADIM 4: PRODUCTION DEPLOY (15 dakika)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. GitHub'a push et:
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git remote add origin https://github.com/YOUR_USERNAME/bombo.git
+   git branch -M main
+   git push -u origin main
+
+2. Vercel'e bağlan:
+   - https://vercel.com adresine git
+   - GitHub hesabınla giriş yap
+   - "New Project" > "bombo" repository'sini seç
+   - "Import" butonuna tıkla
+
+3. Environment Variables ekle:
+   - Settings > Environment Variables
+   - Tüm Firebase credentials'ını ekle
+
+4. Deploy et:
+   - "Deploy" butonuna tıkla
+   - Deployment tamamlanana kadar bekle
+   - URL'i kopyala (örn: https://bombo.vercel.app)
+
+✅ Canlı yayında!
+
+
+🔒 ADIM 5: FIRESTORE GÜVENLİK (5 dakika)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Firebase Console > Firestore > "Kurallar" sekmesi
+2. Aşağıdaki kodu yapıştır:
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+  }
+}
+
+3. "Yayınla" butonuna tıkla
+
+✅ Güvenlik kuralları ayarlandı!
+
+
+🎉 TAMAMLANDI!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Artık:
+✅ Yerel olarak geliştirme yapabilirsin
+✅ Arkadaşlarını davet edebilirsin
+✅ Canlı URL'i paylaşabilirsin
+✅ Verileri Firebase'de güvenli şekilde sakla
+
+Arkadaşlarına ver: https://bombo.vercel.app
+
+
+📚 DAHA FAZLA YARDIM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+- SETUP_GUIDE.md - Detaylı kurulum rehberi
+- DEPLOYMENT.md - Deployment adımları
+- README.md - Proje dokumentasyonu
+
+Sorun mu var?
+- Browser console'u aç (F12)
+- Hata mesajlarını oku
+- Firebase Console'da Firestore'u kontrol et
+
+
+💰 MALİYET
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Firebase: Ücretsiz (Spark plan)
+Vercel: Ücretsiz
+Domain: ~$10-15/yıl (opsiyonel)
+
+TOPLAM: 0₺ (tamamen ücretsiz!)
+
+
+Happy coding! 💪
