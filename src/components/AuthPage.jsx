@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useFirebaseStore } from '../firebaseStore'
-import { Mail, Lock, User, Ruler, Weight, Cake } from 'lucide-react'
+import { Mail, Lock, User, Ruler, Dumbbell, Cake } from 'lucide-react'
 
 export default function AuthPage() {
   const { register, login, loading, error } = useFirebaseStore()
@@ -133,7 +133,7 @@ export default function AuthPage() {
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">Kilo (kg)</label>
                     <div className="relative">
-                      <Weight className="absolute left-2 top-2 text-gray-500" size={16} />
+                      <Dumbbell className="absolute left-2 top-2 text-gray-500" size={16} />
                       <input
                         type="number"
                         value={formData.weight}
