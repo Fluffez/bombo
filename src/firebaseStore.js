@@ -12,6 +12,7 @@ import {
   deleteDoc,
   doc,
   getDocs,
+  getDoc,
   query,
   where,
   setDoc
@@ -147,9 +148,10 @@ export const useFirebaseStore = create((set) => ({
   fetchUserData: async (uid) => {
     try {
       if (!uid) return null
-      const userDoc = await getDocs(query(collection(db, 'users'), where('uid', '==', uid)))
-      if (!userDoc.empty) {
-        return userDoc.docs[0].data()
+      const userRef = doc(db, 'users', uid)
+      const userSnap = await getDoc(userRef)
+      if (userSnap.exists()) {
+        return userSnap.data()
       }
       return null
     } catch (error) {
