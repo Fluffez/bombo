@@ -47,16 +47,45 @@ npm run dev
 
 4. Tarayıcında aç: `http://localhost:3000`
 
-### Production'a Deploy Et
+### Production'a Deploy Et (Vercel)
 
-**Ücretsiz deployment için DEPLOYMENT.md dosyasını oku!**
+**Ücretsiz deployment!** Vercel'de 30 saniyede deploy et:
 
-Adımlar:
-1. Firebase projesi oluştur
-2. Credentials'ı `.env.local`'e ekle
-3. GitHub'a push et
-4. Vercel'e bağlan
-5. Canlı yayında!
+#### Adım 1: GitHub'a Push Et
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/YOUR_USERNAME/bombo.git
+git branch -M main
+git push -u origin main
+```
+
+#### Adım 2: Vercel'e Bağlan
+1. https://vercel.com adresine git
+2. GitHub hesabınla giriş yap
+3. "New Project" butonuna tıkla
+4. `bombo` repository'sini seç
+5. "Import" butonuna tıkla
+
+#### Adım 3: Environment Variables Ekle
+Vercel Dashboard'da "Settings" > "Environment Variables" seçeneğine git ve ekle:
+
+```
+VITE_FIREBASE_API_KEY=AIzaSyDxEq3Y3U__19hKuVBUdN8UA7IJIn9jGSU
+VITE_FIREBASE_AUTH_DOMAIN=bombo-workout.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=bombo-workout
+VITE_FIREBASE_STORAGE_BUCKET=bombo-workout.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=511435779994
+VITE_FIREBASE_APP_ID=1:511435779994:web:e8c7080ecba82de2a15423
+```
+
+#### Adım 4: Deploy Et
+"Deploy" butonuna tıkla ve bitmesini bekle (2-5 dakika)
+
+✅ **Canlı!** Vercel sana bir URL verecek (örn: `https://bombo.vercel.app`)
+
+**Detaylı rehber için**: `DEPLOYMENT.md` dosyasını oku
 
 ## Usage
 
